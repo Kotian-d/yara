@@ -1,6 +1,6 @@
 import ConnectDB from "../db/connectDb";
 import api from "../model/apis";
-import operator from "../model/operator";
+import operator from "../model/operators";
 
 
 export async function getOperatorData() {

@@ -2,9 +2,11 @@ import React from 'react'
 import UserList from '../../component/userlist'
 import Link from 'next/link'
 import users from '@/app/model/users'
+import ConnectDB from '@/app/db/connectDb'
 
 
 const UsersPage = async() => {
+  await ConnectDB();
   const userslist = await users.find({}).populate('parent').lean();
   return (
      <div className="w-full flex flex-col gap-3 p-8 bg-background">

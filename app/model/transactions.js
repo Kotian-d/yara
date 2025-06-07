@@ -3,16 +3,16 @@ import mongoose from "mongoose";
 const Transaction = mongoose.Schema(
   {
     number: String,
-    amount: String,
+    amount: Number,
     operator: {
       type: mongoose.SchemaTypes.ObjectId,
       required: true,
-      ref: "User",
+      ref: "Operator",
     },
     status: {
       type: String,
-      enum: ["SUCCESS", "FAILED", "PENDING"],
-      default: "PENDING",
+      enum: ["success", "failed", "pending"],
+      default: "pending",
     },
     req_id: String,
     txn_id: String,
@@ -23,9 +23,9 @@ const Transaction = mongoose.Schema(
     },
     api: {
       type: mongoose.SchemaTypes.ObjectId,
-      required: true,
       ref: "Api",
     },
+    remark: String,
   },
   {
     timestamps: true,

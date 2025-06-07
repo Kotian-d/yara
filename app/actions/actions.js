@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn, signOut } from "@/auth";
+import { auth, signIn, signOut } from "@/auth";
 import users from "../model/users";
 import { RegisterSchema } from "../zodschema/userSchema";
 import ConnectDB from "../db/connectDb";
@@ -9,7 +9,7 @@ import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { getApiById } from "../queries/apiquery";
-import operator from "../model/operator";
+import operator from "../model/operators";
 import { revalidatePath } from "next/cache";
 import smstemplates from "../model/smstemplates";
 import { smsformschema } from "../zodschema/smsformSchema";
@@ -49,6 +49,11 @@ export async function signupUser(formData) {
 
 export async function deleteUser(formData) {
   await ConnectDB();
+
+  const session = await auth();
+  if (!session?.user?.role == "ADMIN")
+    return "You are not authorized to perform this action";
+
   try {
     console.log("delete user");
     const _id = formData.get("id");
@@ -85,6 +90,10 @@ export async function logout() {
 //Api Actions
 export async function addApi(formData) {
   await ConnectDB();
+
+  const session = await auth();
+  if (!session?.user?.role == "ADMIN")
+    return "You are not authorized to perform this action";
 
   try {
     const id = uuidv4();
@@ -162,16 +171,16 @@ export async function addApi(formData) {
         remark_field: RcResponseRemark,
       },
       callback_response: {
-          reqid: CbResponseReqid,
-          status_field: CbResponseStatus,
-          opid_field: CbResponseOpid,
-          apirefid_field: CbResponseApirefid,
-          balance_field: CbResponsebalance,
-          success_key: CbResponseSuccess,
-          failure_key: CbResponseFailure,
-          pending_key: CbResponsePending,
-          remark_field: CbResponseRemark,
-        },
+        reqid: CbResponseReqid,
+        status_field: CbResponseStatus,
+        opid_field: CbResponseOpid,
+        apirefid_field: CbResponseApirefid,
+        balance_field: CbResponsebalance,
+        success_key: CbResponseSuccess,
+        failure_key: CbResponseFailure,
+        pending_key: CbResponsePending,
+        remark_field: CbResponseRemark,
+      },
       operator,
     });
 
@@ -185,6 +194,11 @@ export async function addApi(formData) {
 export async function updateApi(_id, formData) {
   try {
     await ConnectDB();
+
+    const session = await auth();
+    if (!session?.user?.role == "ADMIN")
+      return "You are not authorized to perform this action";
+
     const exists = await api.findById({ _id });
     if (!exists) return "Api doesn't exists";
 
@@ -288,6 +302,10 @@ export async function deleteApi(formData) {
   try {
     await ConnectDB();
 
+    const session = await auth();
+    if (!session?.user?.role == "ADMIN")
+      return "You are not authorized to perform this action";
+
     const { _id } = await getApiById(formData.get("id"));
 
     await api.findByIdAndDelete({ _id });
@@ -302,6 +320,9 @@ export async function deleteApi(formData) {
 
 export async function addOperator(formData) {
   await ConnectDB();
+  const session = await auth();
+  if (!session?.user?.role == "ADMIN")
+    return "You are not authorized to perform this action";
   try {
     const Api1 = await getApiById(formData.get("api1"));
     const Api2 = await getApiById(formData.get("api2"));
@@ -347,6 +368,11 @@ export async function addOperator(formData) {
 
 export async function editOperator(_id, formData) {
   await ConnectDB();
+
+  const session = await auth();
+  if (!session?.user?.role == "ADMIN")
+    return "You are not authorized to perform this action";
+
   try {
     console.log(formData);
     const Api1 = await getApiById(formData.get("api1"));
@@ -396,6 +422,11 @@ export async function editOperator(_id, formData) {
 
 export async function deleteOperator(formData) {
   await ConnectDB();
+
+  const session = await auth();
+  if (!session?.user?.role == "ADMIN")
+    return "You are not authorized to perform this action";
+
   try {
     const _id = formData.get("id");
     await operator.findByIdAndDelete({ _id });
@@ -412,6 +443,10 @@ export async function deleteOperator(formData) {
 export async function updateRoute(formData) {
   try {
     await ConnectDB();
+
+    const session = await auth();
+    if (!session?.user?.role == "ADMIN")
+      return "You are not authorized to perform this action";
 
     const _id = formData.get("id");
     const api1 = await getApiById(formData.get("api1"));
@@ -445,6 +480,11 @@ export async function updateRoute(formData) {
 export async function addSMSApi(formData) {
   try {
     await ConnectDB();
+
+    const session = await auth();
+    if (!session?.user?.role == "ADMIN")
+      return "You are not authorized to perform this action";
+
     const result = smsformschema.safeParse(formData);
 
     if (result.success) {
@@ -490,6 +530,10 @@ export async function addSMSApi(formData) {
 export async function UpdateConfig(formData) {
   try {
     await ConnectDB();
+
+    const session = await auth();
+    if (!session?.user?.role == "ADMIN")
+      return "You are not authorized to perform this action";
 
     let apiroutescount = formData.get("apiroutescount");
     if (apiroutescount < 1) {

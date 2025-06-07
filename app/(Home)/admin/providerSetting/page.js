@@ -1,9 +1,11 @@
 import RoutingTable from "@/app/(Home)/admin/components/routingtable";
-import operator from "@/app/model/operator";
+import operator from "@/app/model/operators";
 import { getApiData } from "@/app/queries/apiquery";
 import siteconfig from "@/app/model/siteconfig";
+import ConnectDB from "@/app/db/connectDb";
 
 const providerSetting = async () => {
+  await ConnectDB();
   const operatordata = await operator
     .find()
     .populate(["api1", "api2", "api3", "api4", "api5", "planapi"])

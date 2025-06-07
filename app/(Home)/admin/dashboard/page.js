@@ -1,6 +1,7 @@
 import { Chart } from "@/app/(Home)/admin/components/chart";
 import DashboardCard from "@/app/(Home)/component/dashboardcard";
 import RecentTransactions from "@/app/(Home)/component/recenthistory";
+import ConnectDB from "@/app/db/connectDb";
 import {
   BadgeAlert,
   BadgeCheck,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 
 export default async function Dashboard() {
+  await ConnectDB();
   const cardlist = [
     {
       title: "Success",

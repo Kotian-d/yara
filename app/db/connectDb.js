@@ -5,7 +5,7 @@ export default async function ConnectDB() {
   try {
     mongoose.set("strictQuery", true);
     await mongoose.connect(process.env.MONGO_URI);
-    return true;
+    return;
   } catch (error) {
     console.log(error);
   }

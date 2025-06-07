@@ -7,14 +7,16 @@ import Updaterouteform from "./updateform";
 import Confirmdailog from "./confirmdailog";
 import Link from "next/link";
 import Image from "next/image";
+import Editoperatordailog from "./editoperatordailog";
 
 const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
   const [isopen, setisopen] = useState(false);
   const [isconfirm, setisconfirm] = useState(false);
   const [iseditable, setisEditable] = useState(false);
   const [editrow, setEditRow] = useState(null);
-  const [delete_id, setDelete_id] = useState(null);
+  const [selectedId, setselectedId] = useState(null);
   const [iseditdailog, setiseditdailog] = useState(false);
+  const [iseditoperator, setiseditoperator] = useState(false);
   const [editItem, seteditItem] = useState(null);
 
   async function SendRouteUpdate(params) {
@@ -82,7 +84,7 @@ const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
                           <td className="border font-medium text-center">
                             <div className="w-full flex justify-center p-2">
                               <Image
-                              alt="logo"
+                                alt="logo"
                                 src={
                                   items.logo
                                     ? items.logo
@@ -122,7 +124,6 @@ const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
                                 </td>
                               );
                             })}
-
 
                           <td className="border font-medium px-4 py-2 text-center">
                             {items?.planapi?.name}
@@ -192,7 +193,7 @@ const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
                         <td className="border font-medium text-center">
                           <div className="w-full flex justify-center p-2">
                             <Image
-                            alt="logo"
+                              alt="logo"
                               src={
                                 items.logo
                                   ? items.logo
@@ -258,14 +259,18 @@ const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
                             className="cursor-pointer h-full"
                           />
 
-                          <Link href={`/user/operator/${items._id}`}>
-                            <Pencil className="cursor-pointer h-full" />
-                          </Link>
+                          <Pencil
+                            className="cursor-pointer h-full"
+                            onClick={() => {
+                              setselectedId(items._id);
+                              setiseditoperator(true);
+                            }}
+                          />
 
                           <button
                             type="button"
                             onClick={() => {
-                              setDelete_id(items._id);
+                              setselectedId(items._id);
                               setisconfirm(true);
                             }}
                           >
@@ -285,10 +290,16 @@ const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
           setisopen={setisopen}
           apidata={apidata}
         />
+        <Editoperatordailog
+          iseditoperator={iseditoperator}
+          setiseditoperator={setiseditoperator}
+          apidata={apidata}
+          id={selectedId}
+        />
         <Confirmdailog
           isconfirm={isconfirm}
           setisconfirm={setisconfirm}
-          id={delete_id}
+          id={selectedId}
         />
       </div>
     </div>

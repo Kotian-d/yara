@@ -1,4 +1,5 @@
 import { UpdateConfig } from "@/app/actions/actions";
+import ConnectDB from "@/app/db/connectDb";
 import siteconfig from "@/app/model/siteconfig";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 
 export default async function Settings() {
+  await ConnectDB();
   const config = await siteconfig.findOne({});
   return (
     <div>

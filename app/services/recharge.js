@@ -1,38 +1,47 @@
-import operator from "../model/operator";
+import { NextResponse } from "next/server";
+import operator from "../model/operators";
 import siteconfig from "../model/siteconfig";
+import transactions from "../model/transactions";
+import { getUserByToken } from "../queries/userquery";
+import apis from "../model/apis";
 
-export default async function recharge(mn, amt, opcode, user) {
-  const operator = await operator
+export default async function recharge(mn, amt, opcode, api_token) {
+  const user = await getUserByToken(api_token);
+
+  if (!user) return { status: "error", message: "Unauthorized User" };
+
+  const _operator = await operator
     .findOne({ opcode })
     .populate(["api1", "api2", "api3", "api4", "api5"]);
 
   //check for
-  if (!operator)
-    return NextResponse.json({
+  if (!_operator)
+    return {
       status: "error",
       message: "Invalid operator code",
-    });
+    };
 
   //check for operator enbaled
-  if (!operator.isenabled)
-    return NextResponse.json({
+  if (!_operator.isenabled)
+    return {
       status: "error",
       message: "Operator Down",
-    });
+    };
 
+  console.log(user);
   //check for user balance
-  if (user.balance < amt)
-    return NextResponse.json({
+  if (user.balance < amt) {
+    return {
       status: "error",
       message: `Insufficient Balance, your balance is ${user.balance}`,
-    });
-
+    };
+  }
   //check for blocked denomination
-  if (operator.denomination.split(",").includes(amt)) {
-    return NextResponse.json({
+  if (_operator.denomination.split(",").includes(amt)) {
+    return {
       status: "error",
       message: `denomination Blocked`,
-    });
+    };
   }
 
   //check for sameamount pending txn
@@ -43,11 +52,11 @@ export default async function recharge(mn, amt, opcode, user) {
     });
 
     if (ispending) {
-      return NextResponse.json({
+      return {
         status: "error",
         message:
           "Given number Transation with same amount is already in pending",
-      });
+      };
     }
   } else {
     const ispending = await transactions
@@ -55,17 +64,16 @@ export default async function recharge(mn, amt, opcode, user) {
       .where("status", "PENDING");
 
     if (ispending) {
-      return NextResponse.json({
+      return {
         status: "error",
         message: "Given number Transation is already in pending",
-      });
+      };
     }
   }
 
   //check for success retries
   const config = await siteconfig.findOne({});
-  console.log(config.successRetry);
-  const successretry = 180;
+  const successretry = config.successRetry;
 
   const foundTx = await transactions.findOne({
     $and: [{ number: mn }, { status: "SUCCESS" }, { amount: amt }],
@@ -77,36 +85,37 @@ export default async function recharge(mn, amt, opcode, user) {
         (new Date().getTime() - Date.parse(foundTx.createdAt)) / 60000
       ) < successretry
     ) {
-      return NextResponse.json({
+      return {
         status: "error",
         message: `Frequent recharge with ${successretry} minutes is banned`,
-      });
+      };
     }
   }
 
+  const req_id = "74" + Math.floor(Math.random() * 90000000 + 10000000) + "100";
+
+  await transactions.create({
+    number: mn,
+    amount: amt,
+    operator: _operator._id,
+    req_id: req_id,
+    userId: user._id,
+  });
+
   for (let i = 1; i <= Number(config.numberOfApiRoutes); i++) {
     try {
-      let api = eval(`operator.api${i}`);
+      let api = eval(`_operator.api${i}`);
 
       if (!api) throw Error("failed");
-	  if(api.isStopRecharge) return NextResponse.json("failed", { status: 200 });
+      if (api.isStopRecharge)
+        return { status: "error", message: "Operator Blocked" };
+
       const [opparam] = api?.operator?.filter((op) => {
         if (op.opcode == opcode) return op;
       });
 
-      const req_id =
-        "74" + Math.floor(Math.random() * 90000000 + 10000000) + "100";
-
-      await transactions.create({
-        number: mn,
-        amount: amt,
-        operator: operator._id,
-        req_id: req_id,
-        userId: user._id,
-      });
-
       console.log(`loop ${i}`);
-      const url = api[`${operator.providertype.toLowerCase()}api`]
+      const url = api[`${_operator.providertype.toLowerCase()}api`]
         .replace("@param1", api.param1)
         .replace("@mn", mn)
         .replace("@amt", amt)
@@ -114,11 +123,11 @@ export default async function recharge(mn, amt, opcode, user) {
         .replace("@opparam1", opparam.opparam1);
 
       let res;
-      const method = api[`${operator.providertype.toLowerCase()}_api_method`];
+      const method = api[`${_operator.providertype.toLowerCase()}_api_method`];
 
       if (method === "GET") {
         res = await fetch(`${api.host}${url}`, {
-          method: api[`${operator.providertype.toLowerCase()}_api_method`],
+          method: api[`${_operator.providertype.toLowerCase()}_api_method`],
         });
       }
 
@@ -148,22 +157,46 @@ export default async function recharge(mn, amt, opcode, user) {
         const balance = eval(`data.${balance_field}`);
         const message = eval(`data.${remark_field}`);
 
+        console.log(data);
+
         if (status === failure_key) {
-          console.log(data);
-          throw Error("failed");
+          await transactions.findOneAndUpdate(
+            { req_id: req_id },
+            {
+              status: "failed",
+              txn_id: txid,
+              api: api._id,
+              remark: message,
+            }
+          );
+          throw Error(JSON.stringify({
+            number: mn,
+            amount: amt,
+            status: "failed",
+            txn_id: txid,
+          }));
         }
 
-        console.log(data);
-        return NextResponse.json(data, { status: 200 });
+        await transactions.findOneAndUpdate(
+          { req_id: req_id },
+          {
+            status: "success",
+            txn_id: txid,
+            api: api._id,
+          }
+        );
+        return { data, status: 200 };
       }
     } catch (error) {
       if (i === Number(config.numberOfApiRoutes)) {
-        return NextResponse.json(error.message, { status: 200 });
+        return { status: "failed", message: error.message };
       }
-	  if (error.message === "") {
-        return NextResponse.json(error.message, { status: 200 });
+      if(eval(`_operator.api${i +1}`).isStopRecharge){
+        return { status: "failed", message: error.message };
+      }
+      if (error.message === "") {
+        return { status: "failed", message: error.message };
       }
     }
   }
-
 }

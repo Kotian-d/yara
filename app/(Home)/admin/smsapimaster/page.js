@@ -1,10 +1,11 @@
 import React from 'react'
 import SMSApiForm from '../../component/smsapiform'
 import smstemplates from '@/app/model/smstemplates'
+import ConnectDB from '@/app/db/connectDb';
 
 const SMSApiMaster = async() => {
+  await ConnectDB();
   const data = await smstemplates.findOne({});
-  console.log(data);
   return (
     <div>
       <SMSApiForm data={JSON.parse(JSON.stringify(data))}/>

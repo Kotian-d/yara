@@ -10,7 +10,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { ChartNoAxesCombined, LayoutDashboard, Menu, PowerIcon, Settings, Unplug, Users } from "lucide-react";
 import { logout } from "../../actions/actions";
@@ -179,8 +178,8 @@ export default function Navbar() {
             </NavigationMenuList>
           </NavigationMenu>
           <form action={onSubmit} className="flex">
-            <button className="cursor-pointer text-3xl">
-              <PowerIcon />
+            <button className="cursor-pointer text-3xl" aria-label="Logout">
+              <PowerIcon className="text-primary stroke-3" />
             </button>
           </form>
         </div>
