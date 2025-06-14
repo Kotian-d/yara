@@ -116,53 +116,59 @@ export default function Navbar() {
                   </Link>
                 )}
               </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>
-                  <div className="flex items-center gap-2">
-                    <Unplug />
-                    <span>API master</span>
-                  </div>
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                    <li className="row-span-3">
-                      <NavigationMenuLink asChild>
-                        <a
-                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                          href="/admin/apimaster"
-                        >
-                          <div className="mb-2 mt-4 text-lg font-medium">
-                            API
-                          </div>
-                          <p className="text-sm leading-tight text-muted-foreground">
-                            allows users to manage API connections by defining
-                            authentication methods, access permissions, and
-                            endpoint configurations. Proper configuration
-                            ensures secure data exchange, seamless integration,
-                            and optimal system performance.
-                          </p>
-                        </a>
-                      </NavigationMenuLink>
-                    </li>
-                    <ListItem href="/admin/smsapimaster" title="SMS Api Master">
-                      Re-usable components built using Radix UI and Tailwind
-                      CSS.
-                    </ListItem>
-                    <ListItem
-                      href="/admin/providerSetting"
-                      title="Provider Api Setting"
-                    >
-                      How to install dependencies and structure your app.
-                    </ListItem>
-                    <ListItem
-                      href="/docs/primitives/typography"
-                      title="Custom Api Setting"
-                    >
-                      Styles for headings, paragraphs, lists...etc
-                    </ListItem>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
+              {session?.user?.role === "ADMIN" && (
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>
+                    <div className="flex items-center gap-2">
+                      <Unplug />
+                      <span>API master</span>
+                    </div>
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                      <li className="row-span-3">
+                        <NavigationMenuLink asChild>
+                          <a
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                            href="/admin/apimaster"
+                          >
+                            <div className="mb-2 mt-4 text-lg font-medium">
+                              API
+                            </div>
+                            <p className="text-sm leading-tight text-muted-foreground">
+                              allows users to manage API connections by defining
+                              authentication methods, access permissions, and
+                              endpoint configurations. Proper configuration
+                              ensures secure data exchange, seamless
+                              integration, and optimal system performance.
+                            </p>
+                          </a>
+                        </NavigationMenuLink>
+                      </li>
+                      <ListItem
+                        href="/admin/smsapimaster"
+                        title="SMS Api Master"
+                      >
+                        Re-usable components built using Radix UI and Tailwind
+                        CSS.
+                      </ListItem>
+                      <ListItem
+                        href="/admin/providerSetting"
+                        title="Provider Api Setting"
+                      >
+                        How to install dependencies and structure your app.
+                      </ListItem>
+                      <ListItem
+                        href="/docs/primitives/typography"
+                        title="Custom Api Setting"
+                      >
+                        Styles for headings, paragraphs, lists...etc
+                      </ListItem>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              )}
+
               <NavigationMenuItem>
                 <NavigationMenuTrigger>
                   <div className="flex items-center gap-2">
@@ -184,14 +190,17 @@ export default function Navbar() {
                   </ul>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/admin/users">
-                  <div className="flex items-center gap-2">
-                    <Users />
-                    Users
-                  </div>
-                </Link>
-              </NavigationMenuItem>
+              {session?.user?.role === "ADMIN" && (
+                <NavigationMenuItem>
+                  <Link href="/admin/users">
+                    <div className="flex items-center gap-2">
+                      <Users />
+                      Users
+                    </div>
+                  </Link>
+                </NavigationMenuItem>
+              )}
+
               <NavigationMenuItem>
                 <Link href="/admin/settings">
                   <div className="flex items-center gap-2">
