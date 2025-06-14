@@ -15,6 +15,7 @@ import smstemplates from "../model/smstemplates";
 import { smsformschema } from "../zodschema/smsformSchema";
 import siteconfig from "../model/siteconfig";
 import api from "../model/apis";
+import transactions from "../model/transactions";
 
 export async function signupUser(formData) {
   try {
@@ -560,5 +561,116 @@ export async function UpdateConfig(formData) {
     throw error;
   } finally {
     revalidatePath("(Home)/admin/settings");
+  }
+}
+
+export async function getTransactionReport(formData, skip, limit) {
+  try {
+    await ConnectDB();
+    const session = await auth();
+    if (!session?.user?.role == "ADMIN")
+      return "You are not authorized to perform this action";
+
+    const query = {};
+    if (formData.date_range?.from === "" && formData.date_range?.to === "") {
+      query.createdAt = {
+        $gte: new Date().setHours(0o0, 0o0, 0o0),
+      };
+    }
+
+    if (formData.date_range?.from && formData.date_range?.to) {
+      query.createdAt = {
+        $gte: new Date(formData.date_range.from).setHours(0o0, 0o0, 0o0),
+        $lte: new Date(formData.date_range.to.toDateString()).setHours(
+          23,
+          59,
+          59
+        ),
+      };
+    } else if (formData.date_range?.from) {
+      query.createdAt = {
+        $gte: new Date(formData.date_range.from).setHours(0o0, 0o0, 0o0),
+      };
+    } else if (formData.date_range?.to) {
+      query.createdAt = {
+        $lte: new Date(formData.date_range.to.toDateString()).setHours(
+          23,
+          59,
+          59
+        ),
+      };
+    }
+
+    if (formData.operator) {
+      query.operator = formData.operator;
+    }
+
+    if (formData.mobile) {
+      query.number = formData.mobile;
+    }
+
+    if (formData.api) {
+      query.api = formData.api;
+    }
+
+    if (formData.txnid) {
+      query.txn_id = formData.txnid;
+    }
+
+    if (formData.amount) {
+      query.amount = formData.amount;
+    }
+
+    if (formData.user) {
+      const user = await getUserByMobile(Number(formData.user));
+      if (!user) {
+        query.userId = null;
+      } else {
+        query.userId = user._id;
+      }
+    }
+
+    if (formData.status) {
+      if (formData.status === "all") {
+      } else {
+        query.status = formData.status;
+      }
+    }
+
+    const trans = await transactions
+      .find(query)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(skip)
+      .populate([
+        { path: "operator", select: "name" },
+        { path: "api", select: "name" },
+        { path: "userId", select: "name mobile" },
+      ]);
+
+    const successCount = await transactions
+      .find(query)
+      .count({ status: "success" });
+    const pendingCount = await transactions
+      .find(query)
+      .count({ status: "pending" });
+    const failCount = await transactions
+      .find(query)
+      .count({ status: "failed" });
+      
+    const totalItem = await transactions
+      .find(query)
+      .sort({ createdAt: -1 })
+      .count({});
+
+    return JSON.stringify({
+      trans,
+      successCount,
+      pendingCount,
+      failCount,
+      totalItem,
+    });
+  } catch (error) {
+    console.log(error);
   }
 }

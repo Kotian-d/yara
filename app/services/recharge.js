@@ -4,11 +4,15 @@ import siteconfig from "../model/siteconfig";
 import transactions from "../model/transactions";
 import { getUserByToken } from "../queries/userquery";
 import apis from "../model/apis";
+import ConnectDB from "../db/connectDb";
+import { runInTransaction } from "./mongoTransactions";
+import users from "../model/users";
 
 export default async function recharge(mn, amt, opcode, api_token) {
-  const user = await getUserByToken(api_token);
+  ConnectDB();
+  const User = await getUserByToken(api_token);
 
-  if (!user) return { status: "error", message: "Unauthorized User" };
+  if (!User) return { status: "error", message: "Unauthorized User" };
 
   const _operator = await operator
     .findOne({ opcode })
@@ -28,12 +32,11 @@ export default async function recharge(mn, amt, opcode, api_token) {
       message: "Operator Down",
     };
 
-  console.log(user);
   //check for user balance
-  if (user.balance < amt) {
+  if (User.balance < amt) {
     return {
       status: "error",
-      message: `Insufficient Balance, your balance is ${user.balance}`,
+      message: `Insufficient Balance, your balance is ${User.balance}`,
     };
   }
   //check for blocked denomination
@@ -92,23 +95,45 @@ export default async function recharge(mn, amt, opcode, api_token) {
     }
   }
 
+  if(!_operator.api1){
+    return { status: "error", message: "No Route Set" };
+  }
+
+  if(_operator.api1.isStopRecharge){
+    return { status: "error", message: "Operator Recharge Blocked" };
+  }
+
   const req_id = "74" + Math.floor(Math.random() * 90000000 + 10000000) + "100";
+
+  const closingbal = parseInt(User.balance) - parseInt(amt);
+
+  await users.findOneAndUpdate({ _id: User._id }, { balance: closingbal });
 
   await transactions.create({
     number: mn,
     amount: amt,
     operator: _operator._id,
     req_id: req_id,
-    userId: user._id,
+    userId: User._id,
   });
 
   for (let i = 1; i <= Number(config.numberOfApiRoutes); i++) {
     try {
       let api = eval(`_operator.api${i}`);
 
-      if (!api) throw Error("failed");
-      if (api.isStopRecharge)
-        return { status: "error", message: "Operator Blocked" };
+      if (!api.isActive) {
+        throw Error({
+          status: "error",
+          message: `${api.name} Api is Inactive`,
+        });
+      }
+
+      await transactions.findOneAndUpdate(
+        { req_id: req_id },
+        {
+          api: api._id,
+        }
+      );
 
       const [opparam] = api?.operator?.filter((op) => {
         if (op.opcode == opcode) return op;
@@ -169,12 +194,14 @@ export default async function recharge(mn, amt, opcode, api_token) {
               remark: message,
             }
           );
-          throw Error(JSON.stringify({
-            number: mn,
-            amount: amt,
-            status: "failed",
-            txn_id: txid,
-          }));
+          throw Error(
+            JSON.stringify({
+              number: mn,
+              amount: amt,
+              status: "failed",
+              txn_id: txid,
+            })
+          );
         }
 
         await transactions.findOneAndUpdate(
@@ -182,16 +209,20 @@ export default async function recharge(mn, amt, opcode, api_token) {
           {
             status: "success",
             txn_id: txid,
-            api: api._id,
           }
         );
         return { data, status: 200 };
       }
     } catch (error) {
       if (i === Number(config.numberOfApiRoutes)) {
+        await users.findOneAndUpdate(
+          { _id: User._id },
+          { $inc: { balance: parseInt(amt) } }
+        );
+
         return { status: "failed", message: error.message };
       }
-      if(eval(`_operator.api${i +1}`).isStopRecharge){
+      if (eval(`_operator.api${i + 1}`).isStopRecharge) {
         return { status: "failed", message: error.message };
       }
       if (error.message === "") {

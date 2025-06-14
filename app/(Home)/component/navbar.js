@@ -11,10 +11,19 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { ChartNoAxesCombined, LayoutDashboard, Menu, PowerIcon, Settings, Unplug, Users } from "lucide-react";
+import {
+  ChartNoAxesCombined,
+  LayoutDashboard,
+  Menu,
+  PowerIcon,
+  Settings,
+  Unplug,
+  Users,
+} from "lucide-react";
 import { logout } from "../../actions/actions";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 const components = [
   {
@@ -29,7 +38,7 @@ const components = [
     description:
       "It includes details such as transaction dates, amounts loaded, payment sources, and wallet balances.",
   },
-   {
+  {
     title: "User Ledger Report",
     href: "/admin/userlegerRpt",
     description:
@@ -58,7 +67,7 @@ const components = [
     description:
       "A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
   },
-   {
+  {
     title: "Complaint Report",
     href: "/admin/complaintRpt",
     description:
@@ -67,6 +76,7 @@ const components = [
 ];
 
 export default function Navbar() {
+  const { data: session } = useSession();
   const router = useRouter();
   async function onSubmit() {
     try {
@@ -90,12 +100,21 @@ export default function Navbar() {
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList className="gap-5">
               <NavigationMenuItem>
-                <Link href="/admin/dashboard">
-                  <div className="flex items-center gap-2">
-                    <LayoutDashboard />
-                    DashBoard
-                  </div>
-                </Link>
+                {session?.user?.role === "ADMIN" ? (
+                  <Link href="/admin/dashboard">
+                    <div className="flex items-center gap-2">
+                      <LayoutDashboard />
+                      DashBoard
+                    </div>
+                  </Link>
+                ) : (
+                  <Link href="/user/dashboard">
+                    <div className="flex items-center gap-2">
+                      <LayoutDashboard />
+                      DashBoard
+                    </div>
+                  </Link>
+                )}
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>
@@ -116,7 +135,11 @@ export default function Navbar() {
                             API
                           </div>
                           <p className="text-sm leading-tight text-muted-foreground">
-                            allows users to manage API connections by defining authentication methods, access permissions, and endpoint configurations. Proper configuration ensures secure data exchange, seamless integration, and optimal system performance.
+                            allows users to manage API connections by defining
+                            authentication methods, access permissions, and
+                            endpoint configurations. Proper configuration
+                            ensures secure data exchange, seamless integration,
+                            and optimal system performance.
                           </p>
                         </a>
                       </NavigationMenuLink>
@@ -125,7 +148,10 @@ export default function Navbar() {
                       Re-usable components built using Radix UI and Tailwind
                       CSS.
                     </ListItem>
-                    <ListItem href="/admin/providerSetting" title="Provider Api Setting">
+                    <ListItem
+                      href="/admin/providerSetting"
+                      title="Provider Api Setting"
+                    >
                       How to install dependencies and structure your app.
                     </ListItem>
                     <ListItem
@@ -158,7 +184,7 @@ export default function Navbar() {
                   </ul>
                 </NavigationMenuContent>
               </NavigationMenuItem>
-               <NavigationMenuItem>
+              <NavigationMenuItem>
                 <Link href="/admin/users">
                   <div className="flex items-center gap-2">
                     <Users />
@@ -174,7 +200,6 @@ export default function Navbar() {
                   </div>
                 </Link>
               </NavigationMenuItem>
-
             </NavigationMenuList>
           </NavigationMenu>
           <form action={onSubmit} className="flex">

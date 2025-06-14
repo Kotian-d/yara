@@ -11,11 +11,21 @@ export default async function middleware(request) {
   const session = await auth();
   const path = request.nextUrl.pathname;
   const isProtectedRoute = ProtectedRoute.includes(path);
-  const isPublicRoute = PublicRoute.includes(path);
+  const isPublicRoute = PublicRoute.includes(path)
+
+
+  if(path.includes("/admin") && session?.user.role !== "ADMIN"){
+    return NextResponse.redirect(new URL("/user/dashboard", request.url));
+  }
+
+  if(path.includes("/user") && session?.user.role !== "USER"){
+    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+  }
 
   if (isProtectedRoute && !session?.user) {
     return NextResponse.redirect(new URL("/auth/signIn", request.url));
   }
+
 
   if (isPublicRoute && session?.user) {
     return NextResponse.redirect(
