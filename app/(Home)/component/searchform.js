@@ -137,15 +137,16 @@ const Searchform = ({
     try {
       const filterdata = await getTransactionReport(values, skip, limit);
       console.log(JSON.parse(filterdata));
-      const { trans, successCount, failCount, pendingCount, totalItem } = JSON.parse(filterdata);
+      const { trans, successCount, failCount, pendingCount, totalItem } =
+        JSON.parse(filterdata);
       setsuccessCount(successCount);
       setfailedCount(failCount);
       setpendingCount(pendingCount);
       setdata(trans);
-      setTotalPages((Math.ceil(totalItem / Limit)));
-      console.log(limit)
-      console.log(totalItem)
-      console.log(TotalPages)
+      setTotalPages(Math.ceil(totalItem / Limit));
+      console.log(limit);
+      console.log(totalItem);
+      console.log(TotalPages);
     } catch (error) {
       toast.error(error.message);
     }
@@ -162,7 +163,7 @@ const Searchform = ({
       const values = new FormData();
       const filterdata = await getTransactionReport(
         values,
-        limit * (value -1),
+        limit * (value - 1),
         limit
       );
       console.log(JSON.parse(filterdata));
@@ -651,28 +652,30 @@ const Searchform = ({
             ))}
           </TableBody>
         </Table>
-        <div className="flex justify-end gap-5 p-3">
-          {page > 1 ? (
-            <Button
-              onClick={() => handlePageChange(Number(page) - 1)}
-              className={"text-white cursor-pointer"}
-            >
-              Previous
-            </Button>
-          ) : (
-            <Button disabled={true}>Previous</Button>
-          )}
-          {page === TotalPages ? (
-             <Button disabled={true}>Next</Button>
-          ) : (
-            <Button
-              onClick={() => handlePageChange(Number(page) + 1)}
-              className={"text-white cursor-pointer"}
-            >
-              Next
-            </Button>
-          )}
-        </div>
+        {TotalPages > 0 && (
+          <div className="flex justify-end gap-5 p-3">
+            {page > 1 ? (
+              <Button
+                onClick={() => handlePageChange(Number(page) - 1)}
+                className={"text-white cursor-pointer"}
+              >
+                Previous
+              </Button>
+            ) : (
+              <Button disabled={true}>Previous</Button>
+            )}
+            {page >= TotalPages ? (
+              <Button disabled={true}>Next</Button>
+            ) : (
+              <Button
+                onClick={() => handlePageChange(Number(page) + 1)}
+                className={"text-white cursor-pointer"}
+              >
+                Next
+              </Button>
+            )}
+          </div>
+        )}
       </div>
       <CustomAlert
         isconfirm={isconfirm}

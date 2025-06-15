@@ -18,6 +18,8 @@ export async function getTransactionDetails(filter, limit, skip) {
     .sort({ createdAt: -1 })
     .count({})
     .lean();
+  
+    console.log(totalPages)
 
   const totalSuccess = await transactions.aggregate([
     {

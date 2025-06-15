@@ -9,10 +9,8 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  DTHScreen,
-  MobileScreen,
-  FasTagScreen,
-  ElectricityScreen,
+  BillPaymetScreen,
+  PrepaidScreen,
 } from "../component/tabScreens";
 import { getOperatorData } from "@/app/queries/operatorquery";
 
@@ -81,6 +79,22 @@ export default async function Dashboard() {
               DTH
             </TabsTrigger>
             <TabsTrigger
+              value="postpaid"
+              className={
+                "bg-slate-50 cursor-pointer data-[state=active]:bg-slate-50 data-[state=active]:shadow-none data-[state=active]:border-b-4 rounded-none data-[state=active]:border-b-primary focus-visible:border-none"
+              }
+            >
+              Postpaid
+            </TabsTrigger>
+             <TabsTrigger
+              value="landline"
+              className={
+                "bg-slate-50 cursor-pointer data-[state=active]:bg-slate-50 data-[state=active]:shadow-none data-[state=active]:border-b-4 rounded-none data-[state=active]:border-b-primary focus-visible:border-none"
+              }
+            >
+              Landline
+            </TabsTrigger>
+            <TabsTrigger
               value="fastag"
               className={
                 "bg-slate-50 cursor-pointer data-[state=active]:bg-slate-50 data-[state=active]:shadow-none data-[state=active]:border-b-4 rounded-none data-[state=active]:border-b-primary focus-visible:border-none"
@@ -98,16 +112,40 @@ export default async function Dashboard() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="mobile">
-            <MobileScreen operator={JSON.parse(JSON.stringify(operator))} />
+            <PrepaidScreen
+              operator={JSON.parse(JSON.stringify(operator))}
+              title={"Mobile"}
+            />
           </TabsContent>
           <TabsContent value="dth">
-            <DTHScreen operator={JSON.parse(JSON.stringify(operator))} />
+            <PrepaidScreen
+              operator={JSON.parse(JSON.stringify(operator))}
+              title={"DTH"}
+            />
+          </TabsContent>
+           <TabsContent value="postpaid">
+            <BillPaymetScreen
+              operator={JSON.parse(JSON.stringify(operator))}
+              title={"Postpaid"}
+            />
+          </TabsContent>
+          <TabsContent value="landline">
+            <BillPaymetScreen
+              operator={JSON.parse(JSON.stringify(operator))}
+              title={"Landline"}
+            />
           </TabsContent>
           <TabsContent value="fastag">
-            <FasTagScreen operator={JSON.parse(JSON.stringify(operator))}/>
+            <BillPaymetScreen
+              operator={JSON.parse(JSON.stringify(operator))}
+              title={"Fastag"}
+            />
           </TabsContent>
           <TabsContent value="electricity">
-            <ElectricityScreen/>
+            <BillPaymetScreen
+              operator={JSON.parse(JSON.stringify(operator))}
+              title={"Electricity"}
+            />
           </TabsContent>
         </Tabs>
         <div className="md:flex gap-5 py-4">

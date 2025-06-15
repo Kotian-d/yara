@@ -18,6 +18,7 @@ import {
   PowerIcon,
   Settings,
   Unplug,
+  User,
   Users,
 } from "lucide-react";
 import { logout } from "../../actions/actions";
@@ -90,9 +91,20 @@ export default function Navbar() {
   return (
     <div className="sticky top-0 z-50">
       <div className="text-2xl bg-primary p-4 text-primary-foreground font-bold">
-        <h1 className="mx-8">
-          <Link href={"/"}>My App</Link>
-        </h1>
+        <div className="mx-8 flex items-center justify-between">
+          <h1>
+            <Link href={"/"}>My App</Link>
+          </h1>
+          {session?.user?.role === "ADMIN" ? (
+            <Link href={"/admin/profile"}>
+              <User size={"2rem"} />
+            </Link>
+          ) : (
+            <Link href={"/user/profile"}>
+              <User size={"2rem"} />
+            </Link>
+          )}
+        </div>
       </div>
       <nav className="p-3 border-b-2 bg-white">
         <div className="mx-8 flex items-center justify-between bg-white">

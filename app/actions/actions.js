@@ -674,3 +674,21 @@ export async function getTransactionReport(formData, skip, limit) {
     console.log(error);
   }
 }
+
+export async function fetchBill(params) {
+  setTimeout(()=>{
+    return {
+      name: "Dummmy",
+      amount: 2000,
+    }
+  }, 10000);
+}
+
+export async function payBill(params) {
+  setTimeout(()=>{
+    return {
+      status: "success",
+      message: "Payment Successfull",
+    }
+  }, 20000);
+}
