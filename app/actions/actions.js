@@ -69,7 +69,7 @@ export async function deleteUser(formData) {
 
 export async function signInUser(formData) {
   try {
-    await signIn("credentials", formData, { redirectTo: "/user/dashboard" });
+    await signIn("credentials", formData, { redirectTo: `/user/dashboard` });
   } catch (error) {
     if (isRedirectError(error)) {
       return;
@@ -331,11 +331,17 @@ export async function addOperator(formData) {
     const logo = formData.get("logo");
     const name = formData.get("name");
     const opcode = formData.get("opcode");
+    const isfetchbill = formData.get("isfetchbill") ? true : false;
+    const mobile_labeltext = formData.get("mobilelabel");
+    const mobile_length = formData.get("mobilelength");
+    const amount_labletext = formData.get("amountlabel");
+    const amount_length = formData.get("amountlength");
     const providertype = formData.get("providertype");
     const api1 = Api1._id;
     const api2 = Api2._id;
     const planapi = Planapi._id;
-    const isenabled = formData.get("isactive");
+    const isactive = formData.get("isactive");
+    const isenabled = isactive ? true : false;
     const denomination = formData.get("denomination");
     let file_path = "/uploads/thumbnail.png";
 
@@ -353,6 +359,11 @@ export async function addOperator(formData) {
       logo: file_path,
       name,
       opcode,
+      isfetchbill,
+      mobile_labeltext,
+      mobile_length,
+      amount_labletext,
+      amount_length,
       providertype,
       api1,
       api2,
@@ -382,11 +393,17 @@ export async function editOperator(_id, formData) {
     const logo = formData.get("logo");
     const name = formData.get("name");
     const opcode = formData.get("opcode");
+    const isfetchbill = formData.get("isfetchbill");
+    const mobile_labeltext = formData.get("mobilelabel");
+    const mobile_length = formData.get("mobilelength");
+    const amount_labletext = formData.get("amountlabel");
+    const amount_length = formData.get("amountlength");
     const providertype = formData.get("providertype");
     const api1 = Api1._id;
     const api2 = Api2._id;
     const planapi = Planapi._id;
-    const isenabled = formData.get("isactive");
+    const isactive = formData.get("isactive");
+    const isenabled = isactive ? true : false;
     const denomination = formData.get("denomination");
 
     if (logo instanceof File) {
@@ -405,6 +422,11 @@ export async function editOperator(_id, formData) {
         logo,
         name,
         opcode,
+        isfetchbill,
+        mobile_labeltext,
+        mobile_length,
+        amount_labletext,
+        amount_length,
         providertype,
         api1,
         api2,
@@ -657,7 +679,7 @@ export async function getTransactionReport(formData, skip, limit) {
     const failCount = await transactions
       .find(query)
       .count({ status: "failed" });
-      
+
     const totalItem = await transactions
       .find(query)
       .sort({ createdAt: -1 })
@@ -676,19 +698,25 @@ export async function getTransactionReport(formData, skip, limit) {
 }
 
 export async function fetchBill(params) {
-  setTimeout(()=>{
-    return {
-      name: "Dummmy",
-      amount: 2000,
-    }
-  }, 10000);
+  return {
+    success: true,
+    data: [
+      {
+        billAmount: "199.0",
+        dueDate: "20160702",
+        statusMessage:
+          "Bill amount = 199.0, BillDueDate = 02 Jul 2016. Due date has been expired",
+        acceptPayment: false,
+        acceptPartPay: false,
+        maxBillAmount: "",
+      },
+    ],
+  };
 }
 
 export async function payBill(params) {
-  setTimeout(()=>{
-    return {
-      status: "success",
-      message: "Payment Successfull",
-    }
-  }, 20000);
+  return {
+    status: "success",
+    message: "Payment Successfull",
+  };
 }

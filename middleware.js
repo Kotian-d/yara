@@ -12,13 +12,15 @@ export default async function middleware(request) {
   const path = request.nextUrl.pathname;
   const isProtectedRoute = ProtectedRoute.includes(path);
   const isPublicRoute = PublicRoute.includes(path)
+  const usersPath = new RegExp("^/user", "i");
+  const adminPath = new RegExp("^/admin", "i");
 
 
-  if(path.includes("/admin") && session?.user.role !== "ADMIN"){
+  if(adminPath.test(path) && session?.user.role !== "ADMIN"){
     return NextResponse.redirect(new URL("/user/dashboard", request.url));
   }
 
-  if(path.includes("/user") && session?.user.role !== "USER"){
+  if(usersPath.test(path) && session?.user.role !== "USER"){
     return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
 

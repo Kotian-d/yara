@@ -36,7 +36,8 @@ const FetchBill = ({operator, setbillfetched}) => {
 
   async function onBillFetch(values) {
     const data = await fetchBill(values)
-    toast.success(data);
+    console.log(data)
+    toast.success(JSON.stringify(data));
     setbillfetched(true)
   }
   return (

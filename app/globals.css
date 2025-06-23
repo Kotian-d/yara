@@ -112,7 +112,6 @@
   --sidebar-ring: oklch(0.645 0.246 16.439);
 }
 
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -120,4 +119,20 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.mostly-customized-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 8px;
+  background-color: var(--primary-foreground); /* or add it to the track */
+}
+
+.mostly-customized-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: var(--primary); /* or add it to the track */
+}
+
+.mostly-customized-scrollbar {
+  scrollbar-color: var(--primary) var(--primary-foreground) !important;;
+  scrollbar-width: thin !important;;
 }

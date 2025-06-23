@@ -10,7 +10,7 @@ export default function Layout({ children }) {
   return (
     <>
       <Navbar />
-      {children}
+      <div className="min-h-svh">{children}</div>
       <Footer />
     </>
   );

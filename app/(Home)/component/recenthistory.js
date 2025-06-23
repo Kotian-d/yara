@@ -104,7 +104,7 @@ const RecentTransactions = () => {
   ];
 
   return (
-    <Card className="overflow-hidden flex-1">
+    <Card className="overflow-hidden flex-1 mostly-customized-scrollbar">
       <CardHeader>
         <CardTitle>Last 10 Transaction</CardTitle>
       </CardHeader>

@@ -24,52 +24,67 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { operator } from "../../../zodschema/operatorSchema";
 import { Button } from "@/components/ui/button";
-import { addOperator } from "@/app/actions/actions";
+import { editOperator } from "@/app/actions/actions";
 import Image from "next/image";
+import { Toaster, toast } from "react-hot-toast";
 
 const Editoperatordailog = ({
+  editItem,
   iseditoperator,
   setiseditoperator,
   apidata,
-  id,
+  providerTypes,
 }) => {
+  console.log(editItem);
   const form = useForm({
     resolver: zodResolver(operator),
     defaultValues: {
-      logo: null,
-      name: "",
-      opcode: "",
-      providertype: "",
-      api1: "",
-      api2: "",
-      planapi: "",
-      isactive: true,
-      denomination: "",
+      logo: editItem?.logo,
+      name: editItem?.name,
+      opcode: editItem?.opcode,
+      isfetchbill: editItem?.isfetchbill ? editItem?.isfetchbill : false,
+      mobilelabel: editItem?.number_labeltext,
+      mobilelength: editItem?.mobile_length,
+      amountlabel: editItem?.amount_labletext,
+      amountlength: editItem?.amount_length,
+      providertype: editItem?.providertype?._id,
+      api1: editItem?.api1.id,
+      api2: editItem?.api2.id,
+      planapi: editItem?.planapi.id,
+      isactive: editItem ? editItem.isactive : false,
+      denomination: editItem?.denomination,
     },
   });
 
-  const { fields } = useFieldArray({
-    control: form.control,
-    name: "apis",
-  });
-
   async function onSubmit(params) {
-    const formData = new FormData();
-    formData.append("logo", params.logo);
-    formData.append("name", params.name);
-    formData.append("opcode", params.opcode);
-    formData.append("providertype", params.providertype);
-    formData.append("api1", params.api1);
-    formData.append("api2", params.api2);
-    formData.append("planapi", params.planapi);
-    formData.append("isactive", params.isactive);
-    formData.append("denomination", params.denomination);
-    await addOperator(formData);
+    try {
+      const formData = new FormData();
+      formData.append("logo", params.logo);
+      formData.append("name", params.name);
+      formData.append("opcode", params.opcode);
+      formData.append("isfetchbill", params.isfetchbill);
+      formData.append("mobilelabel", params.mobilelabel);
+      formData.append("mobilelength", params.mobilelength);
+      formData.append("amountlabel", params.amountlabel);
+      formData.append("amountlength", params.amountlength);
+      formData.append("providertype", params.providertype);
+      formData.append("api1", params.api1);
+      formData.append("api2", params.api2);
+      formData.append("planapi", params.planapi);
+      formData.append("isactive", params.isactive);
+      formData.append("denomination", params.denomination);
+
+      const editOperatorById = editOperator.bind(null, editItem._id);
+      const response = await editOperatorById(formData);
+      toast.success(response);
+    } catch (error) {
+      Toaster.error(error);
+    }
     form.reset();
-    setisopen(false);
+    setiseditoperator(false);
   }
 
   return (
@@ -78,7 +93,7 @@ const Editoperatordailog = ({
       onOpenChange={setiseditoperator}
       className="p-5"
     >
-      <DialogContent className="lg:max-w-[30%] overflow-y-scroll max-h-[85%]">
+      <DialogContent className="lg:max-w-[30%] overflow-y-scroll max-h-[85%] mostly-customized-scrollbar">
         <DialogHeader>
           <DialogTitle className="text-center p-3">Edit operator</DialogTitle>
           <DialogDescription className="text-center">
@@ -97,7 +112,7 @@ const Editoperatordailog = ({
               <Image
                 className="border rounded-full"
                 alt="Operator Logo"
-                src={"/public/uploads/Airtel.png"}
+                src={editItem?.logo}
                 width={75}
                 height={75}
               />
@@ -156,6 +171,62 @@ const Editoperatordailog = ({
               )}
             />
 
+                <FormField
+              control={form.control}
+              name="mobilelabel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mobile number Label Text</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Mobile number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="mobilelength"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mobile number length</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Min-Max Length" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="amountlabel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Amount Label</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Amount" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="amountlength"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Min and Max Amount length</FormLabel>
+                  <FormControl>
+                    <Input placeholder="10-10000" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="providertype"
@@ -166,14 +237,19 @@ const Editoperatordailog = ({
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <FormControl>
+                    <FormControl className={"w-full"}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select ProviderType" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="prepaid">Prepaid</SelectItem>
-                      <SelectItem value="DTH">DTH</SelectItem>
+                      {providerTypes.map((types, index) => {
+                        return (
+                          <SelectItem value={types._id} key={index}>
+                            {types.name}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -181,50 +257,17 @@ const Editoperatordailog = ({
               )}
             />
 
-            {fields.map((value, index) => {
-              return (
-                <FormField
-                  control={form.control}
-                  name={`apis.${index}._id`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>API {index + 1}</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {apidata.map((api, index) => {
-                            return (
-                              <SelectItem key={index} value={api.id}>
-                                {api.name}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              );
-            })}
             <FormField
               control={form.control}
               name="api1"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className={"w-full"}>
                   <FormLabel>API 1</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <FormControl>
+                    <FormControl className={"w-full"}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -257,7 +300,7 @@ const Editoperatordailog = ({
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <FormControl>
+                    <FormControl className={"w-full"}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -289,7 +332,7 @@ const Editoperatordailog = ({
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <FormControl>
+                    <FormControl className={"w-full"}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>

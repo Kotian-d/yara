@@ -36,7 +36,7 @@ const PayBill = ({operator}) => {
 
   async function onSubmit(values) {
     const data = await payBill(values)
-    toast.success(data);
+    toast.success(JSON.stringify(data));
     
   }
   return (

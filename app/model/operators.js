@@ -15,7 +15,26 @@ const Operator = mongoose.Schema(
       unique: true,
       required: true,
     },
-    providertype: String,
+    isfetchbill: {
+      type: Boolean,
+      default: false,
+    },
+    number_labeltext: {
+      type: String,
+    },
+    mobile_length: {
+      type: String,
+    },
+    amount_labletext:{
+      type: String
+    },
+    amount_length:{
+      type: String
+    },
+    providertype: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProviderType",
+    },
     api1: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Api",

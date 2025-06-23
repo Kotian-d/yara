@@ -35,7 +35,7 @@ const Updaterouteform = ({
       <td className="border font-medium px-2 py-2 text-center">{items.name}</td>
 
       <td className="border font-medium px-2 py-2 text-center">
-        {items.providertype}
+        {items.providertype?.name}
       </td>
 
       {new Array(Number(apiroutecount)).fill("0").map((val, index) => {
@@ -95,7 +95,7 @@ const Updaterouteform = ({
         />
       </td>
 
-      <td className="text-center gap-8 flex justify-center items-center py-2 w-full">
+      <td className="text-center gap-8 flex justify-center items-center py-4 w-full">
         <button type="submit">
           <Save className="cursor-pointer" />
         </button>

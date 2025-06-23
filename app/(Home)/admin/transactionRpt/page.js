@@ -33,7 +33,7 @@ const TransactionRpt = async ({ searchParams }) => {
   //console.log(trans);
 
   return (
-    <div className="py-2 px-3 flex flex-col gap-5 mb-5">
+    <div className="py-2 px-3 flex flex-col gap-5 mb-5 mostly-customized-scrollbar">
       <h2 className="font-sans text-md">Recharge Report</h2>
       <Searchform
         operator={JSON.parse(JSON.stringify(operator))}

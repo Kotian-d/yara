@@ -26,7 +26,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
-const components = [
+const Admincomponents = [
   {
     title: "Transaction Report",
     href: "/admin/transactionRpt",
@@ -41,7 +41,7 @@ const components = [
   },
   {
     title: "User Ledger Report",
-    href: "/admin/userlegerRpt",
+    href: "/admin/userledgerRpt",
     description:
       "This Report provides a detailed record of all financial transactions associated with a user's account.",
   },
@@ -76,9 +76,42 @@ const components = [
   },
 ];
 
-export default function Navbar() {
+const Usercomponents = [
+  {
+    title: "Transaction Report",
+    href: "/user/transactionRpt",
+    description:
+      "This report detailing transaction dates, amounts, payment methods, and recipients for accurate tracking and analysis.",
+  },
+  {
+    title: "Load Wallet Transction",
+    href: "/user/loadwalletRpt",
+    description:
+      "It includes details such as transaction dates, amounts loaded, payment sources, and wallet balances.",
+  },
+  {
+    title: "Ledger Report",
+    href: "/user/ledgerRpt",
+    description:
+      "This Report provides a detailed record of all financial transactions associated with a user's account.",
+  },
+  {
+    title: "Cashback Report",
+    href: "/user/cashbackRpt",
+    description: "Visually or semantically separates content.",
+  },
+  {
+    title: "OperatorWise Report",
+    href: "/user/operatorwiseRpt",
+    description:
+      "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
+  },
+];
+
+export default function Navbar({balance}) {
   const { data: session } = useSession();
   const router = useRouter();
+
   async function onSubmit() {
     try {
       await logout();
@@ -107,28 +140,20 @@ export default function Navbar() {
         </div>
       </div>
       <nav className="p-3 border-b-2 bg-white">
-        <div className="mx-8 flex items-center justify-between bg-white">
-          <Menu className="md:hidden cursor-pointer" />
-          <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList className="gap-5">
-              <NavigationMenuItem>
-                {session?.user?.role === "ADMIN" ? (
+        {session?.user?.role === "ADMIN" ? (
+          <div className="mx-8 flex items-center justify-between bg-white">
+            <Menu className="md:hidden cursor-pointer" />
+            <NavigationMenu className="hidden md:flex">
+              <NavigationMenuList className="gap-5">
+                <NavigationMenuItem>
                   <Link href="/admin/dashboard">
                     <div className="flex items-center gap-2">
                       <LayoutDashboard />
                       DashBoard
                     </div>
                   </Link>
-                ) : (
-                  <Link href="/user/dashboard">
-                    <div className="flex items-center gap-2">
-                      <LayoutDashboard />
-                      DashBoard
-                    </div>
-                  </Link>
-                )}
-              </NavigationMenuItem>
-              {session?.user?.role === "ADMIN" && (
+                </NavigationMenuItem>
+
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>
                     <div className="flex items-center gap-2">
@@ -138,14 +163,14 @@ export default function Navbar() {
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                      <li className="row-span-3">
+                      <li className="row-span-4">
                         <NavigationMenuLink asChild>
                           <a
                             className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                             href="/admin/apimaster"
                           >
                             <div className="mb-2 mt-4 text-lg font-medium">
-                              API
+                              APIs
                             </div>
                             <p className="text-sm leading-tight text-muted-foreground">
                               allows users to manage API connections by defining
@@ -176,33 +201,37 @@ export default function Navbar() {
                       >
                         Styles for headings, paragraphs, lists...etc
                       </ListItem>
+                       <ListItem
+                        href="/admin/providertypes"
+                        title="ProviderTypes"
+                      >
+                        Styles for headings, paragraphs, lists...etc
+                      </ListItem>
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
-              )}
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>
+                    <div className="flex items-center gap-2">
+                      <ChartNoAxesCombined />
+                      Reports
+                    </div>
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                      {Admincomponents.map((component) => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}
+                        >
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
 
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>
-                  <div className="flex items-center gap-2">
-                    <ChartNoAxesCombined />
-                    Reports
-                  </div>
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                    {components.map((component) => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        href={component.href}
-                      >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              {session?.user?.role === "ADMIN" && (
                 <NavigationMenuItem>
                   <Link href="/admin/users">
                     <div className="flex items-center gap-2">
@@ -211,24 +240,79 @@ export default function Navbar() {
                     </div>
                   </Link>
                 </NavigationMenuItem>
-              )}
 
-              <NavigationMenuItem>
-                <Link href="/admin/settings">
-                  <div className="flex items-center gap-2">
-                    <Settings />
-                    Settings
-                  </div>
-                </Link>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-          <form action={onSubmit} className="flex">
-            <button className="cursor-pointer text-3xl" aria-label="Logout">
-              <PowerIcon className="text-primary stroke-3" />
-            </button>
-          </form>
-        </div>
+                <NavigationMenuItem>
+                  <Link href="/admin/settings">
+                    <div className="flex items-center gap-2">
+                      <Settings />
+                      Settings
+                    </div>
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+            <form action={onSubmit} className="flex">
+              <button className="cursor-pointer text-3xl" aria-label="Logout">
+                <PowerIcon className="text-primary stroke-3" />
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="mx-8 flex items-center justify-between bg-white">
+            <Menu className="md:hidden cursor-pointer" />
+            <NavigationMenu className="hidden md:flex">
+              <NavigationMenuList className="gap-5">
+                <NavigationMenuItem>
+                  <Link href="/user/dashboard">
+                    <div className="flex items-center gap-2">
+                      <LayoutDashboard />
+                      DashBoard
+                    </div>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>
+                    <div className="flex items-center gap-2">
+                      <ChartNoAxesCombined />
+                      Reports
+                    </div>
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                      {Usercomponents.map((component) => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}
+                        >
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link href="/user/settings">
+                    <div className="flex items-center gap-2">
+                      <Settings />
+                      Settings
+                    </div>
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <span>Balance: ₹ {balance}</span>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+
+            <form action={onSubmit} className="flex">
+              <button className="cursor-pointer text-3xl" aria-label="Logout">
+                <PowerIcon className="text-primary stroke-3" />
+              </button>
+            </form>
+          </div>
+        )}
       </nav>
     </div>
   );

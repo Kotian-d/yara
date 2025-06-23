@@ -9,14 +9,18 @@ import Link from "next/link";
 import Image from "next/image";
 import Editoperatordailog from "./editoperatordailog";
 
-const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
+const RoutingTable = ({
+  operatordata,
+  apidata,
+  apiroutecount,
+  providerTypes,
+}) => {
   const [isopen, setisopen] = useState(false);
   const [isconfirm, setisconfirm] = useState(false);
   const [iseditable, setisEditable] = useState(false);
   const [editrow, setEditRow] = useState(null);
   const [selectedId, setselectedId] = useState(null);
   const [iseditdailog, setiseditdailog] = useState(false);
-  const [iseditoperator, setiseditoperator] = useState(false);
   const [editItem, seteditItem] = useState(null);
 
   async function SendRouteUpdate(params) {
@@ -37,7 +41,7 @@ const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
           + ADD Operator
         </button>
       </div>
-      <div className="overflow-auto">
+      <div className="overflow-auto mostly-customized-scrollbar">
         <form action={SendRouteUpdate}>
           <table className="table-auto w-full">
             <thead>
@@ -97,17 +101,17 @@ const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
                           </td>
 
                           <td className="border font-medium px-4 py-2 text-center">
-                            {items.opcode}
+                            {items?.opcode}
                           </td>
 
                           {/** Provider Type */}
                           <td className="border font-medium px-4 py-2 text-center">
-                            {items.name}
+                            {items?.name}
                           </td>
 
                           {/** Provider Type */}
                           <td className="border font-medium px-4 py-2 text-center">
-                            {items.providertype}
+                            {items?.providertype?.name}
                           </td>
 
                           {new Array(Number(apiroutecount))
@@ -216,7 +220,7 @@ const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
 
                         {/** Provider Type */}
                         <td className="border font-medium px-4 py-2 text-center">
-                          {items.providertype}
+                          {items?.providertype?.name}
                         </td>
 
                         {new Array(Number(apiroutecount))
@@ -250,7 +254,7 @@ const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
                           )}
                         </td>
 
-                        <td className="text-center gap-4 flex justify-center items-center py-2 w-full">
+                        <td className="text-center gap-4 flex justify-center items-center py-4 w-full">
                           <FilePenLine
                             onClick={() => {
                               setisEditable(true);
@@ -262,8 +266,8 @@ const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
                           <Pencil
                             className="cursor-pointer h-full"
                             onClick={() => {
-                              setselectedId(items._id);
-                              setiseditoperator(true);
+                              seteditItem(items);
+                              setiseditdailog(true);
                             }}
                           />
 
@@ -289,13 +293,18 @@ const RoutingTable = ({ operatordata, apidata, apiroutecount }) => {
           isopen={isopen}
           setisopen={setisopen}
           apidata={apidata}
+          providerTypes={providerTypes}
         />
-        <Editoperatordailog
-          iseditoperator={iseditoperator}
-          setiseditoperator={setiseditoperator}
-          apidata={apidata}
-          id={selectedId}
-        />
+        {iseditdailog && (
+          <Editoperatordailog
+            iseditoperator={iseditdailog}
+            setiseditoperator={setiseditdailog}
+            editItem={editItem}
+            apidata={apidata}
+            providerTypes={providerTypes}
+          />
+        )}
+
         <Confirmdailog
           isconfirm={isconfirm}
           setisconfirm={setisconfirm}

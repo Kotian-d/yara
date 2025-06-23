@@ -29,13 +29,18 @@ import { operator } from "../../../zodschema/operatorSchema";
 import { Button } from "@/components/ui/button";
 import { addOperator } from "@/app/actions/actions";
 
-const Operatordailog = ({ isopen, setisopen, apidata }) => {
+const Operatordailog = ({ isopen, setisopen, apidata, providerTypes }) => {
   const form = useForm({
     resolver: zodResolver(operator),
     defaultValues: {
       logo: null,
       name: "",
       opcode: "",
+      isfetchbill: false,
+      mobilelabel: "",
+      mobilelength: "",
+      amountlabel: "",
+      amountlength: "",
       providertype: "",
       api1: "",
       api2: "",
@@ -45,16 +50,16 @@ const Operatordailog = ({ isopen, setisopen, apidata }) => {
     },
   });
 
-  const { fields } = useFieldArray({
-    control: form.control,
-    name: "apis",
-  });
-
   async function onSubmit(params) {
     const formData = new FormData();
     formData.append("logo", params.logo);
     formData.append("name", params.name);
     formData.append("opcode", params.opcode);
+    formData.append("isfetchbill", params.isfetchbill);
+    formData.append("mobilelabel", params.mobilelabel);
+    formData.append("mobilelength", params.mobilelength);
+    formData.append("amountlabel", params.amountlabel);
+    formData.append("amountlength", params.amountlength);
     formData.append("providertype", params.providertype);
     formData.append("api1", params.api1);
     formData.append("api2", params.api2);
@@ -68,7 +73,7 @@ const Operatordailog = ({ isopen, setisopen, apidata }) => {
 
   return (
     <Dialog open={isopen} onOpenChange={setisopen} className="p-5">
-      <DialogContent className="lg:max-w-[30%] overflow-y-scroll max-h-[85%]">
+      <DialogContent className="lg:max-w-[30%] overflow-y-scroll max-h-[85%] mostly-customized-scrollbar">
         <DialogHeader>
           <DialogTitle className="text-center p-3">Add operator</DialogTitle>
           <DialogDescription className="text-center">
@@ -139,6 +144,62 @@ const Operatordailog = ({ isopen, setisopen, apidata }) => {
 
             <FormField
               control={form.control}
+              name="mobilelabel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mobile number Label Text</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Mobile number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="mobilelength"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mobile number length</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Min-Max Length" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="amountlabel"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Amount Label</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Amount" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="amountlength"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Min and Max Amount length</FormLabel>
+                  <FormControl>
+                    <Input placeholder="10-10000" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="providertype"
               render={({ field }) => (
                 <FormItem>
@@ -147,14 +208,19 @@ const Operatordailog = ({ isopen, setisopen, apidata }) => {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <FormControl>
+                    <FormControl className={"w-full"}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select ProviderType" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="prepaid">Prepaid</SelectItem>
-                      <SelectItem value="DTH">DTH</SelectItem>
+                      {providerTypes.map((types, index) => {
+                        return (
+                          <SelectItem value={types._id} key={index}>
+                            {types.name}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -162,39 +228,6 @@ const Operatordailog = ({ isopen, setisopen, apidata }) => {
               )}
             />
 
-            {fields.map((value, index) => {
-              return (
-                <FormField
-                  control={form.control}
-                  name={`apis.${index}._id`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>API {index + 1}</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {apidata.map((api, index) => {
-                            return (
-                              <SelectItem key={index} value={api.id}>
-                                {api.name}
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              );
-            })}
             <FormField
               control={form.control}
               name="api1"
@@ -205,7 +238,7 @@ const Operatordailog = ({ isopen, setisopen, apidata }) => {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <FormControl>
+                    <FormControl className={"w-full"}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -238,7 +271,7 @@ const Operatordailog = ({ isopen, setisopen, apidata }) => {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <FormControl>
+                    <FormControl className={"w-full"}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
@@ -270,7 +303,7 @@ const Operatordailog = ({ isopen, setisopen, apidata }) => {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <FormControl>
+                    <FormControl className={"w-full"}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>

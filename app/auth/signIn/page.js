@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 
 import {
   Card,
@@ -31,6 +31,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 export default function signIn() {
+  const {data: session} = useState();
   const router = useRouter();
   const form = useForm({
     resolver: zodResolver(LoginSchema),
