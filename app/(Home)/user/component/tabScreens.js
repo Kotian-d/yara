@@ -27,12 +27,21 @@ import {
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFormState } from "react-hook-form";
-import { Loader2 } from "lucide-react";
+import {
+  Bus,
+  BusFront,
+  BusIcon,
+  Loader2,
+  Plane,
+  Ticket,
+  Train,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import PayBill from "./paybill";
 import FetchBill from "./fetchbill";
+import Link from "next/link";
 
 export function PrepaidScreen({ operator, title }) {
   const form = useForm({
@@ -154,7 +163,56 @@ export function BillPaymetScreen({ operator, title }) {
         <CardDescription></CardDescription>
       </CardHeader>
       <CardContent className={"flex justify-center items-center"}>
-      { billfetched ? <PayBill operator={operator} /> : <FetchBill operator={operator} setbillfetched={setbillfetched} /> }
+        {billfetched ? (
+          <PayBill operator={operator} />
+        ) : (
+          <FetchBill operator={operator} setbillfetched={setbillfetched} />
+        )}
+      </CardContent>
+      <CardFooter className="flex-col gap-2"></CardFooter>
+    </Card>
+  );
+}
+
+export function BookingScreen({ operator, title }) {
+  return (
+    <Card className="w-full flex justify-center">
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription></CardDescription>
+      </CardHeader>
+      <CardContent className={"flex gap-8 items-center"}>
+        <Link href={"#"}>
+          <div className="w-35 h-35 border rounded-md cursor-pointer flex items-end justify-end">
+            Fastag Booking
+          </div>
+        </Link>
+        <Link href={"#"}>
+          <div className="w-35 h-35 border rounded-md cursor-pointer flex-col">
+            <div className="flex justify-end p-4">
+              <BusIcon size={35} />
+            </div>
+            <span className="text-sm">Bus ticket Booking</span>
+          </div>
+        </Link>
+        <Link href={"#"}>
+          <div className="w-35 h-35 border rounded-md cursor-pointer flex items-end justify-end">
+            <Train />
+            <span className="text-sm ">Train ticket Booking</span>
+          </div>
+        </Link>
+        <Link href={"#"}>
+          <div className="w-35 h-35 border rounded-md cursor-pointer flex items-end justify-end">
+            <Plane />
+            <span className="text-sm ">Flight ticket Booking</span>
+          </div>
+        </Link>
+        <Link href={"#"}>
+          <div className="w-35 h-35 border rounded-md cursor-pointer flex items-end justify-end">
+            <Ticket />
+            <span className="text-sm ">Movie ticket Booking</span>
+          </div>
+        </Link>
       </CardContent>
       <CardFooter className="flex-col gap-2"></CardFooter>
     </Card>

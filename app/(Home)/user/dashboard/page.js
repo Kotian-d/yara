@@ -8,7 +8,11 @@ import {
   Wallet,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BillPaymetScreen, PrepaidScreen } from "../component/tabScreens";
+import {
+  BillPaymetScreen,
+  BookingScreen,
+  PrepaidScreen,
+} from "../component/tabScreens";
 import { getOperatorData } from "@/app/queries/operatorquery";
 import providertype from "@/app/model/providertype";
 
@@ -91,6 +95,14 @@ export default async function Dashboard() {
                     />
                   </TabsContent>
                 );
+              } else if (providerType.name.toLowerCase() === "booking") {
+                console.log("booking");
+                return(<TabsContent
+                  value={providerType.name.toLowerCase()}
+                  key={index}
+                >
+                  <BookingScreen />
+                </TabsContent>);
               } else {
                 return (
                   <TabsContent
