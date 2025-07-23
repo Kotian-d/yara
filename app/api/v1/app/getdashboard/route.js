@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 export async function GET(request) {
   await ConnectDB();
   return NextResponse.json({
-    balance: 1000.0,
-    opening: 0.0,
-    purchase: 2000.0,
-    sale: 1060.0,
-    commission: 60.0,
+    balance: 1000.00,
+    opening: 0.00,
+    purchase: 2000.00,
+    sale: 1060.00,
+    commission: 60.00,
   });
 }
