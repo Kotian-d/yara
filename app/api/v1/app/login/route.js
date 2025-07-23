@@ -6,7 +6,7 @@ export async function POST(request) {
   const { mobile, password } = await request.json();
   console.log(mobile, password);
 
-  if(mobile !== "1234567890" || password !== "password") {
+  if(mobile !== "9739283261" || password !== "pass1234") {
     return NextResponse.json({ status: "error", message: "Invalid credentials" }, { status: 401 });
   }
 
