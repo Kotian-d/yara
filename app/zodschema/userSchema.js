@@ -36,6 +36,17 @@ export const RegisterSchema = z
       .regex(new RegExp("^[0-9]+$"), {
         message: "Enter a valid Number",
       }),
+    shopname: z
+      .string()
+      .min(2, {
+        message: "shopname must be at least 2 characters.",
+      })
+      .trim()
+      .optional(),
+    state: z
+      .string()
+      .trim()
+      .optional(),
     password: z
       .string()
       .min(8, {

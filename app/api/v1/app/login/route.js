@@ -1,14 +1,57 @@
 import ConnectDB from "@/app/db/connectDb";
+import { getUserFromDb, isValidUser } from "@/app/queries/userquery";
+import { LoginSchema } from "@/app/zodschema/userSchema";
 import { NextResponse } from "next/server";
+import JWT from "jsonwebtoken";
+import { generateAccessToken, generateRefreshToken } from "@/app/services/jwthelpers";
 
 export async function POST(request) {
   await ConnectDB();
-  const { mobile, password } = await request.json();
-  console.log(mobile, password);
+  try {
+    await ConnectDB();
+    const result = LoginSchema.safeParse(await request.json());
+    if (result.success) {
+      const { mobile, password } = result.data;
 
-  if(mobile !== "9739283261" || password !== "pass1234") {
-    return NextResponse.json({ status: "error", message: "Invalid credentials" }, { status: 401 });
+      const user = await getUserFromDb(mobile);
+
+      if (!user) {
+        return NextResponse.json(
+          { status: "error", message: "User not found." },
+          { status: 404 }
+        );
+      }
+      // logic to verify if the user exists
+      const isvalid = await isValidUser(password, user.password);
+
+      if (!isvalid) {
+        // No user found, so this is their first attempt to login
+        // Optionally, this is also the place you could do a user registration
+        return NextResponse.json(
+          { status: "error", message: "Invalid credentials." },
+          { status: 403 }
+        );
+      }
+
+      const accessToken = await generateAccessToken(user._id.toString());
+      const refreshToken = await generateRefreshToken(user._id.toString());
+
+      // return user object with their profile data
+      return NextResponse.json(
+        { status: "success", accessToken, refreshToken },
+        { status: 200 }
+      );
+    }
+
+    console.log(result.error.errors);
+    return NextResponse.json(
+      { status: "error", message: `${result.error.errors[0].path[0]} ${result.error.errors[0].message}` },
+      { status: 400 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { status: "error", message: error.message },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({ status: "success", message: "Login successful" }, { status: 200  });
 }
