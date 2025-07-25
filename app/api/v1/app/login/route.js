@@ -5,7 +5,6 @@ import { NextResponse } from "next/server";
 import { generateAccessToken, generateRefreshToken } from "@/app/services/jwthelpers";
 
 export async function POST(request) {
-  await ConnectDB();
   try {
     await ConnectDB();
     const result = LoginSchema.safeParse(await request.json());
