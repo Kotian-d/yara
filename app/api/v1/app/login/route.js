@@ -2,7 +2,6 @@ import ConnectDB from "@/app/db/connectDb";
 import { getUserFromDb, isValidUser } from "@/app/queries/userquery";
 import { LoginSchema } from "@/app/zodschema/userSchema";
 import { NextResponse } from "next/server";
-import JWT from "jsonwebtoken";
 import { generateAccessToken, generateRefreshToken } from "@/app/services/jwthelpers";
 
 export async function POST(request) {
