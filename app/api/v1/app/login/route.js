@@ -27,7 +27,7 @@ export async function POST(request) {
         // Optionally, this is also the place you could do a user registration
         return NextResponse.json(
           { status: "error", message: "Invalid credentials." },
-          { status: 403 }
+          { status: 401 }
         );
       }
 

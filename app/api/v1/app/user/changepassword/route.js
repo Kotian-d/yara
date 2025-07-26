@@ -1,33 +1,12 @@
 import ConnectDB from "@/app/db/connectDb";
 import { NextResponse } from "next/server";
-import { verifyAccessToken } from "@/app/services/jwthelpers";
 import users from "@/app/model/users";
 import bcrypt from "bcryptjs";
 import { isValidUser } from "@/app/queries/userquery";
-import { TokenExpiredError } from 'jsonwebtoken'
 
 export async function POST(request) {
   await ConnectDB();
-
-  if (!request.headers.get("authorization")) {
-    return NextResponse.json(
-      { status: "error", message: "Authorization header is missing" },
-      { status: 401 }
-    );
-  }
-
   try {
-    const isAuthorized = await verifyAccessToken(
-      request.headers.get("authorization")?.split(" ")[1]
-    );
-    console.log("isAuthorized", isAuthorized);
-    if (!isAuthorized) {
-      return NextResponse.json(
-        { status: "error", message: "Unauthorized access" },
-        { status: 401 }
-      );
-    }
-
     const { currentpassword, newpassword, confirmpassword } =
       await request.json();
 
@@ -40,9 +19,12 @@ export async function POST(request) {
         { status: 403 }
       );
     }
+    const userId = request.headers.get("isAuthorized");
 
-    const user = await users.findOne({ _id: isAuthorized.aud });
+    const user = await users.findOne({ _id: userId });
     const isvalid = await isValidUser(currentpassword, user.password);
+
+    console.log(user)
 
     if (!isvalid) {
       return NextResponse.json(
@@ -64,12 +46,7 @@ export async function POST(request) {
       { status: 200 }
     );
   } catch (error) {
-    if (error instanceof TokenExpiredError) {
-      return NextResponse.json(
-        { status: "error", message: error.message },
-        { status: 403 }
-      );
-    }
+    console.log(error)
     return NextResponse.json(
       { status: "error", message: "Internal Server Error" },
       { status: 500 }
