@@ -15,7 +15,7 @@ export const LoginSchema = z.object({
 
 export const RegisterSchema = z
   .object({
-    username: z
+    name: z
       .string()
       .min(2, {
         message: "Username must be at least 2 characters.",
@@ -38,9 +38,6 @@ export const RegisterSchema = z
       }),
     shopname: z
       .string()
-      .min(2, {
-        message: "shopname must be at least 2 characters.",
-      })
       .trim()
       .optional(),
     state: z

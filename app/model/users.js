@@ -31,6 +31,7 @@ const User = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    shopname: String,
     balance: {
       type: Number,
       default: 0,

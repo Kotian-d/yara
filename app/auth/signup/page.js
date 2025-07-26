@@ -32,7 +32,7 @@ export default function Signup() {
   const form = useForm({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
-      username: "",
+      name: "",
       email: "",
       mobile: "",
       password: "",
@@ -68,7 +68,7 @@ export default function Signup() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="username"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Username</FormLabel>

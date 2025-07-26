@@ -22,6 +22,8 @@ export async function POST(request) {
         name: result.data.username,
         email: result.data.email,
         password: hashedpassword,
+        shopname: result.data.shopname,
+        state: result.data.state,
         api_token: api_token,
         isactive: true,
         mobile: Number(result.data.mobile),
