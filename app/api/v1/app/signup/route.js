@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
 import { RegisterSchema } from "@/app/zodschema/userSchema";
 import { NextResponse } from "next/server";
+import ConnectDB from "@/app/db/connectDb";
 
 export async function POST(request) {
   try {
@@ -41,7 +42,7 @@ export async function POST(request) {
     );
   } catch (error) {
     return NextResponse.json(
-      { status: "error", message: result.error.message },
+      { status: "error", message: error.message },
       { status: 400 }
     );
   }
