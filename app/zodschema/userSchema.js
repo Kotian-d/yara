@@ -51,7 +51,7 @@ export const RegisterSchema = z
       })
       .trim()
       .optional(),
-      confirm: z
+      confirmPassword: z
       .string()
       .min(8, {
         message: "ConfirmPassword should be atleast of 8 characters",
@@ -59,7 +59,7 @@ export const RegisterSchema = z
       .trim()
       .optional(),
   })
-  .refine((data) => data.password === data.confirm, {
+  .refine((data) => data.password === data.confirmPassword, {
     message: "Password and confirm password doesn't match",
     path: ["confirmPassword"],
   });

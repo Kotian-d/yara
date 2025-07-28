@@ -4,11 +4,13 @@ import bcrypt from "bcryptjs";
 import { RegisterSchema } from "@/app/zodschema/userSchema";
 import { NextResponse } from "next/server";
 import ConnectDB from "@/app/db/connectDb";
+import users from "@/app/model/users";
 
 export async function POST(request) {
   try {
     await ConnectDB();
     const result = RegisterSchema.safeParse(await request.json());
+    console.log(result);
     if (result.success) {
       const emailexits = await getUserByEmail(result.data.email);
       if (emailexits) throw new Error("Email id already exists in the system");
@@ -20,7 +22,7 @@ export async function POST(request) {
       const hashedpassword = await bcrypt.hash(result.data.password, 10);
       const api_token = uuidv4();
       await users.create({
-        name: result.data.username,
+        name: result.data.name,
         email: result.data.email,
         password: hashedpassword,
         shopname: result.data.shopname,
