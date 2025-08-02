@@ -7,6 +7,10 @@ export async function GET(request) {
     await ConnectDB();
     const userId = request.headers.get("isAuthorized");
 
+    const user = await users.findOne({_id: userId});
+
+    if(!user) return NextResponse.json({status: error, message: "User not found"}, {status: 401});
+
     const { name, email, mobile, address, pincode } = await users.findOne({
       _id: userId,
     });

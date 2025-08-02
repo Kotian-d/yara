@@ -4,10 +4,10 @@ export async function sendWhatsappMsg(number, username, password) {
   const smstemplate = await smstemplates.findOne({});
   const message = smstemplate.registrationtemplate
     .replace("@retailername", username)
-    .replace("@websitename", "Ezeecharge")
+    .replace("@websitename", "YARA")
     .replace("@username", number)
     .replace("@password", password)
-    .replace("@websiteurl", "www.ezeecharge.com");
+    .replace("@websiteurl", "www.yara.com");
 
   const url = smstemplate.whatsappapi
     .replace("@number", `91${number}`)
@@ -26,10 +26,10 @@ export async function sendTextSMS(number, username, password) {
   const templateId = smstemplate.registrationtemplateid;
   const message = smstemplate.registrationtemplate
     .replace("@retailername", username)
-    .replace("@websitename", "Pavathi")
+    .replace("@websitename", "YARA")
     .replace("@username", number)
     .replace("@password", password)
-    .replace("@websiteurl", "pavathi.com");
+    .replace("@websiteurl", "yara.com");
 
   const url = smstemplate.textsmsapi
     .replace("@number", number)
