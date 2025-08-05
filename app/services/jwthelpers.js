@@ -19,7 +19,7 @@ export const generateRefreshToken = async (userId) => {
   const jwt = await new SignJWT({ userId })
     .setProtectedHeader({ alg: "HS256" }) // Algorithm for signing
     .setIssuedAt() // Set issued at timestamp//Set audienece
-    .setExpirationTime("1y") // Token expires in 1 hour
+    .setExpirationTime("1m") // Token expires in 1 hour
     .sign(encodedSecret); // Sign with the secret key
 
   return jwt;
