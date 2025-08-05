@@ -6,6 +6,7 @@ export async function GET(request) {
   try {
     await ConnectDB();
     const userId = request.headers.get("isAuthorized");
+    console.log(request)
 
     const user = await users.findOne({_id: userId});
 

@@ -28,23 +28,30 @@ export default async function middleware(request) {
       );
     }
 
-    const isAuthorized = await verifyToken(
-      request.headers.get("authorization")?.split(" ")[1]
-    );
+    try {
+      const isAuthorized = await verifyToken(
+        request.headers.get("authorization")?.split(" ")[1]
+      );
 
-    if (!isAuthorized) {
+      if (!isAuthorized) {
+        return NextResponse.json(
+          { status: "error", message: "Unauthorized access" },
+          { status: 401 }
+        );
+      }
+
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set("isAuthorized", isAuthorized.userId);
+      const modifiedRequest = new Request(request, { headers: requestHeaders });
+
+      // Continue with the modified request
+      return NextResponse.next({ request: modifiedRequest });
+    } catch (error) {
       return NextResponse.json(
-        { status: "error", message: "Unauthorized access" },
+        { status: "error", message: error.message },
         { status: 401 }
       );
     }
-
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set("isAuthorized", isAuthorized.userId);
-    const modifiedRequest = new Request(request, { headers: requestHeaders });
-
-    // Continue with the modified request
-    return NextResponse.next({ request: modifiedRequest });
   }
 
   if (adminPath.test(path) && session?.user.role !== "ADMIN") {
