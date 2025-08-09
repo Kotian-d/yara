@@ -47,7 +47,6 @@ export default async function middleware(request) {
       // Continue with the modified request
       return NextResponse.next({ request: modifiedRequest });
     } catch (error) {
-      console.log(error);
       return NextResponse.json(
         { status: "error", message: error.message },
         { status: 401 }

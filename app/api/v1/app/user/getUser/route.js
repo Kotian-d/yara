@@ -15,18 +15,17 @@ export async function GET(request) {
         { status: 401 }
       );
 
-    const { balance } = await users.findOne({
+    const { name, mobile, email } = await users.findOne({
       _id: userId,
     });
 
     return NextResponse.json({
-        balance,
-        opening: 0.0,
-        purchase: 2000.0,
-        sale: 1060.0,
-        commission: 60.0,
+        name,
+        mobile,
+        email
     });
   } catch (error) {
+    console.log(error)
     return NextResponse.json({ error }, { status: 500 });
   }
 }

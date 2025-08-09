@@ -6,17 +6,55 @@ export async function GET(request) {
   try {
     await ConnectDB();
     const userId = request.headers.get("isAuthorized");
-    console.log(request)
+    console.log(request);
 
-    const user = await users.findOne({_id: userId});
+    const user = await users.findOne({ _id: userId });
 
-    if(!user) return NextResponse.json({status: error, message: "User not found"}, {status: 401});
+    if (!user)
+      return NextResponse.json(
+        { status: "error", message: "User not found" },
+        { status: 401 }
+      );
 
     const { name, email, mobile, address, pincode } = await users.findOne({
       _id: userId,
     });
 
     return NextResponse.json({ name, email, mobile, address, pincode });
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
+  }
+}
+
+export async function POST(request) {
+  try {
+    await ConnectDB();
+    const userId = request.headers.get("isAuthorized");
+    const user = await users.findOne({ _id: userId });
+
+    if (!user)
+      return NextResponse.json(
+        { status: error, message: "User not found" },
+        { status: 401 }
+      );
+
+    const { name, address, pincode } = await request.json();
+
+    const updated_profile = await users.findByIdAndUpdate(
+      {
+        _id: userId,
+      },
+      { name, address, pincode }
+    );
+
+    return NextResponse.json({
+      status: "success",
+      name: updated_profile.name,
+      email: updated_profile.email,
+      mobile: updated_profile.mobile,
+      address: updated_profile.address,
+      pincode: updated_profile.pincode,
+    });
   } catch (error) {
     return NextResponse.json({ error }, { status: 500 });
   }
