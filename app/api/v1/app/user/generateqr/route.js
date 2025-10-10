@@ -26,7 +26,7 @@ export async function POST(request) {
       "2e4de2cdf3abaf525644f88de06e4436",
       amount,
       orderid.toString(),
-      `https://https://yara-one.vercel.app/integration/tez/callback/${orderid}.toString()`,
+      `https://yara-one.vercel.app/integration/tez/callback/${orderid}.toString()`,
       "testremark",
       "testremark2"
     );   
