@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import CreateOrderAPI from "@/app/integration/tezgateway";
+import CreateOrderAPI from "@/app/integration/tez/tezgateway";
 
 function generateOrderNumber() {
   // The smallest 12-digit number is 10^11
@@ -26,7 +26,7 @@ export async function POST(request) {
       "2e4de2cdf3abaf525644f88de06e4436",
       amount,
       orderid.toString(),
-      "https://https://yara-one.vercel.app/callback/8787772321800",
+      `https://https://yara-one.vercel.app/integration/tez/callback/${orderid}.toString()`,
       "testremark",
       "testremark2"
     );   
